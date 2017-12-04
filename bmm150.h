@@ -21,8 +21,23 @@ public:
    * \brief Read magnetometer data
   */
   void read_mag_data();
+
+  /**
+   * @brief This internal API is used to obtain the compensated
+   * magnetometer x axis data(micro-tesla) in float.
+  */
   int16_t compensate_x(int16_t mag_data_z, uint16_t data_rhall);
+
+  /**
+   * @brief This internal API is used to obtain the compensated
+   * magnetometer Y axis data(micro-tesla) in int16_t.
+  */
   int16_t compensate_y(int16_t mag_data_z, uint16_t data_rhall);
+
+  /**
+   * @brief This internal API is used to obtain the compensated
+   * magnetometer Z axis data(micro-tesla) in int16_t.
+  */
   int16_t compensate_z(int16_t mag_data_z, uint16_t data_rhall);
 
   /**
@@ -37,7 +52,8 @@ public:
   void read_trim_registers();
 
   /**
-   * 
+   * @brief This internal API writes the op_mode value in the Opmode bits
+   * (bits 1 and 2) of 0x4C register.
   */
   void write_op_mode(uint8_t op_mode);
   
@@ -47,19 +63,18 @@ public:
   void set_preset_mode(uint8_t mode);
 
   /** 
-   * \brief
+   * @brief This internal API sets/resets the power control bit of 0x4B register.
   */
   void set_power_control_bit(uint8_t pwrcntrl_bit);
 
   /**
-   * 
-   * 
+   * @brief This internal API sets the device from suspend to sleep mode
+   * by setting the power control bit to '1' of 0x4B register
   */
   void suspend_to_sleep_mode();
   
   /**
-   * 
-   * 
+   * @brief This API is used to set the preset mode of the sensor.
   */
   void set_presetmode(uint8_t preset_mode);
   
@@ -80,14 +95,32 @@ public:
 */
 
   /**
-   * 
+   * @brief This internal API sets the preset mode ODR and repetition settings.
   */
   void set_odr_xyz_rep(struct bmm150_settings settings);
+
+  /**
+   * @brief This internal API sets the xy repetition value in the 0x51 register.
+  */
   void set_xy_rep(struct bmm150_settings settings);
+
+  /**
+   * @brief This internal API sets the z repetition value in the 0x52 register.
+  */
   void set_z_rep(struct bmm150_settings settings);
+
+  /**
+   * @brief This internal API is used to set the output data rate of the sensor.
+  */
   void set_odr(struct bmm150_settings settings);
 
+  /**
+   * @brief This API is used to perform soft-reset of the sensor
+    * where all the registers are reset to their default values except 0x4B.
+  */
   void soft_reset();
+  
+  
   /**
    * 
   */

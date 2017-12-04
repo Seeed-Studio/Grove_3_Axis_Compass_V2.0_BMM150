@@ -29,8 +29,8 @@ int8_t BMM150::initialize(void)
 
 	/* Setting the preset mode as Low power mode 
 	i.e. data rate = 10Hz XY-rep = 1 Z-rep = 2*/
-	// set_presetmode(BMM150_PRESETMODE_LOWPOWER);
-	set_presetmode(BMM150_HIGHACCURACY_REPZ);
+	set_presetmode(BMM150_PRESETMODE_LOWPOWER);
+	// set_presetmode(BMM150_HIGHACCURACY_REPZ);
 	
   return BMM150_OK;
 }
@@ -294,10 +294,6 @@ void BMM150::set_z_rep(struct bmm150_settings settings)
 }
 
 
-/*
- * @brief This API is used to perform soft-reset of the sensor
- * where all the registers are reset to their default values except 0x4B.
- */
 void BMM150::soft_reset()
 {
 	uint8_t reg_data;
@@ -308,13 +304,14 @@ void BMM150::soft_reset()
 	delay(BMM150_SOFT_RESET_DELAY);
 }
 
+
 void BMM150::set_odr(struct bmm150_settings settings)
 {
     uint8_t reg_data;
 
     reg_data = i2c_read(BMM150_OP_MODE_ADDR);
     /*Set the ODR value */
-	reg_data = BMM150_SET_BITS(reg_data, BMM150_ODR, settings.data_rate);
+		reg_data = BMM150_SET_BITS(reg_data, BMM150_ODR, settings.data_rate);
     i2c_write(BMM150_OP_MODE_ADDR, reg_data);
 }
 
