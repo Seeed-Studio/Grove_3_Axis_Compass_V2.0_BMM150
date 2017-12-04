@@ -25,6 +25,10 @@ void setup()
 
 }
 
+/**
+ * @brief Do figure-8 calibration for a limited time to get offset values of x/y/z axis.
+ * @param timeout - seconds of calibration period.
+*/
 void calibrate(uint32_t timeout)
 {
   int16_t value_x_min = 0;
@@ -34,9 +38,6 @@ void calibrate(uint32_t timeout)
   int16_t value_z_min = 0;
   int16_t value_z_max = 0;
   uint32_t timeStart = 0;
-
-  // value_offset.x
-  // value_offset.y
 
   bmm.read_mag_data();  
   value_x_min = bmm.raw_mag_data.raw_datax;
