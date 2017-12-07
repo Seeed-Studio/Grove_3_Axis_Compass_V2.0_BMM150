@@ -8,7 +8,7 @@ Key features
 
 | IC Name | Interface | Votage Range | VDDIO Range | Magnetic Range                   | Magnetic Resolution |
 | ------- | --------- | ------------ | ----------- | -------------------------------- | ------------------- |
-| BMM150  | I2C       | 3.3V ~ 5.0V  | 1.2V ~ 3.6V | ±1300μT(x,y), ±2500μT(z)         | ~0.3μT              |
+| BMM150  | I2C       | 3.3V ~ 5.0V  | 1.2V ~ 3.6V | ±1300µT(x,y), ±2500μT(z)         | ~0.3μT              |
 
 Usage
 ===
