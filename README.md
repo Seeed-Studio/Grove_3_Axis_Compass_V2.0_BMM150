@@ -6,9 +6,9 @@ This is Arduino library for **Bosch BMM150** a Geomagnetic Sensor IC.
 Key features
 ===
 
-| IC Name | Interface | Votage Range | VDDIO Range | Magnetic Range                   | Magnetic Resolution |
-| ------- | --------- | ------------ | ----------- | -------------------------------- | ------------------- |
-| BMM150  | I2C       | 3.3V ~ 5.0V  | 1.2V ~ 3.6V | ±1300µT(x,y), ±2500μT(z)         | ~0.3μT              |
+| IC Name | Interface | Votage Range | VDDIO Range | Magnetic Range           | Magnetic Resolution | Output Degree |
+| ------- | --------- | ------------ | ----------- | ------------------------ | ------------------- | ------------- |
+| BMM150  | I2C       | 3.3V ~ 5.0V  | 1.2V ~ 3.6V | ±1300µT(x,y), ±2500μT(z) | ~0.3μT              | 0º ~ 360º     |
 
 Usage
 ===
@@ -22,7 +22,7 @@ Usage
 
 5. Do figure-8 calibration in 10 seconds while serial monitor echo dot symbol. The calibration period can be changed through the parameter timeout in **calibrate(uint16_t timeout)**.
 
-6. Heading value is in range of 0º ~ 360º, this value is for Y axis, 0º means **Y** axis points at **North**, 180º means **Y** axis points at **South**.
+6. Heading value is in range of 0º ~ 360º, this value is for Y axis, 0º means **Y** axis points at **North**, 90º means **Y** axis points at **West**, 180º means **Y** axis points at **South**, 270º means **Y** points at **East**.
 
 ![](./img/BMM150_SerMonitor_2.png)
 
