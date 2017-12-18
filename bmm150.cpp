@@ -40,7 +40,7 @@ void BMM150::read_mag_data()
     int16_t msb_data;
     int8_t reg_data[BMM150_XYZR_DATA_LEN] = {0};
     
-    i2c_read(BMM150_DATA_X_LSB, reg_data, BMM150_XYZR_DATA_LEN);
+    i2c_read(BMM150_DATA_X_LSB, (uint8_t *)reg_data[0], BMM150_XYZR_DATA_LEN);
 
     /* Mag X axis data */
     reg_data[0] = BMM150_GET_BITS(reg_data[0], BMM150_DATA_X);
