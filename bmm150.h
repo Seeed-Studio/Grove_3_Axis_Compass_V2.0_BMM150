@@ -136,6 +136,7 @@ public:
 
     void i2c_write(short address, short byte);
     void i2c_read(short address, uint8_t *buffer, short length);
+    void i2c_read(short address, int8_t *buffer, short length);
     uint8_t i2c_read(short address);
 
 };
