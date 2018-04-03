@@ -1,0 +1,36 @@
+  
+#######################################
+# Syntax Coloring Map For Grove 3Axis 
+# Compass V2.0 BMM150
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+initialize	KEYWORD2
+read_mag_data	KEYWORD2
+compensate_x	KEYWORD2
+compensate_y	KEYWORD2
+compensate_z	KEYWORD2
+set_op_mode	KEYWORD2
+read_trim_registers	KEYWORD2
+write_op_mode	KEYWORD2
+set_preset_mode	KEYWORD2
+set_power_control_bit	KEYWORD2
+suspend_to_sleep_mode	KEYWORD2
+set_presetmode	KEYWORD2
+set_odr_xyz_rep	KEYWORD2
+set_xy_rep	KEYWORD2
+set_z_rep	KEYWORD2
+set_odr	KEYWORD2
+soft_reset	KEYWORD2
+#######################################
+# Constants (LITERAL1)
+#######################################
