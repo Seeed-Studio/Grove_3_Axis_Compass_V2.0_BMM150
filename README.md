@@ -16,25 +16,26 @@ Key features
 
 Usage
 ===
+### Basic example
 
 1. Taking an Arduino board, connect Grove_3_Axis_Compass_V2.0(BBM150) to the I2C port.
-2. Open example/BMM150_Example/BMM150_Example.ino.
+2. Open example/compass/compass.ino.
 3. Compile and upload sketch.
 4. Open Arduino serial monitor.
+![](./img/BMM150_SerMonitor_3.png)
+5. Heading value is in range of 0º ~ 360º, this value is for Y axis, 0º means **Y** axis points at **North**, 90º means **Y** axis points at **West**, 180º means **Y** axis points at **South**, 270º means **Y** points at **East**.<br>
 
-![](./img/BMM150_SerMonitor_1.png)
-
-5. Do figure-8 calibration in 10 seconds while serial monitor echo dot symbol. The calibration period can be changed through the parameter timeout in **calibrate(uint16_t timeout)**.
-
-6. Heading value is in range of 0º ~ 360º, this value is for Y axis, 0º means **Y** axis points at **North**, 90º means **Y** axis points at **West**, 180º means **Y** axis points at **South**, 270º means **Y** points at **East**.
-
+### Example use figure-8 calibration
+1. Open example/figure8_calibration/figure8_calibration.ino.
+2. Compile and upload sketch.
+3. Open Arduino serial monitor.
+![](./img/BMM150_SerMonitor_1.png) <br>
+**Figure-8 Calibration**, the figure-8 calibration is an easy way to get offset values for x/y/z axis.<br>
+![](img/figure_8_calibration.jpg) <br>
+6. Do figure-8 calibration in 10 seconds while serial monitor echo dot symbol. The calibration period can be changed through the parameter timeout in **calibrate(uint16_t timeout)**.<br>
 ![](./img/BMM150_SerMonitor_2.png)
 
-***Figure-8 Calibration***
 
-![](img/figure_8_calibration.jpg) <br>
-
-The figure-8 calibration is an easy way to get offset values of x/y/z axis.
 
 
 For more infomation refer to [wiki page]().
