@@ -182,7 +182,7 @@
 #define BMM150_NEGATIVE_SATURATION_Z        (-32767)
 #define BMM150_POSITIVE_SATURATION_Z        (32767)
 #ifdef BMM150_USE_FLOATING_POINT
-#define BMM150_OVERFLOW_OUTPUT_FLOAT		0.0f
+    #define BMM150_OVERFLOW_OUTPUT_FLOAT		0.0f
 #endif
 
 /**\name Register read lengths	*/
@@ -209,88 +209,87 @@
 
 /**\name Macro to SET and GET BITS of a register*/
 #define BMM150_SET_BITS(reg_data, bitname, data) \
-				((reg_data & ~(bitname##_MSK)) | \
-				((data << bitname##_POS) & bitname##_MSK))
+    ((reg_data & ~(bitname##_MSK)) | \
+     ((data << bitname##_POS) & bitname##_MSK))
 
 #define BMM150_GET_BITS(reg_data, bitname)  ((reg_data & (bitname##_MSK)) >> \
-							(bitname##_POS))
+        (bitname##_POS))
 
 #define BMM150_SET_BITS_POS_0(reg_data, bitname, data) \
-				((reg_data & ~(bitname##_MSK)) | \
-				(data & bitname##_MSK))
+    ((reg_data & ~(bitname##_MSK)) | \
+     (data & bitname##_MSK))
 
 #define BMM150_GET_BITS_POS_0(reg_data, bitname)  (reg_data & (bitname##_MSK))
 
 
-struct bmm150_mag_data
-{
+struct bmm150_mag_data {
     int16_t x;
     int16_t y;
     int16_t z;
 };
 
 /*
- * @brief bmm150 un-compensated (raw) magnetometer data
- */
+    @brief bmm150 un-compensated (raw) magnetometer data
+*/
 struct bmm150_raw_mag_data {
-	/*! Raw mag X data */
-	int16_t raw_datax;
-	/*! Raw mag Y data */
-	int16_t raw_datay;
-	/*! Raw mag Z data */
-	int16_t raw_dataz;
-	/*! Raw mag resistance value */
-	uint16_t raw_data_r;
+    /*! Raw mag X data */
+    int16_t raw_datax;
+    /*! Raw mag Y data */
+    int16_t raw_datay;
+    /*! Raw mag Z data */
+    int16_t raw_dataz;
+    /*! Raw mag resistance value */
+    uint16_t raw_data_r;
 };
 
 /*!
- * @brief bmm150 trim data structure
- */
+    @brief bmm150 trim data structure
+*/
 struct bmm150_trim_registers {
-	/*! trim x1 data */
-	int8_t dig_x1;
-	/*! trim y1 data */
-	int8_t dig_y1;
-	/*! trim x2 data */
-	int8_t dig_x2;
-	/*! trim y2 data */
-	int8_t dig_y2;
-	/*! trim z1 data */
-	uint16_t dig_z1;
-	/*! trim z2 data */
-	int16_t dig_z2;
-	/*! trim z3 data */
-	int16_t dig_z3;
-	/*! trim z4 data */
-	int16_t dig_z4;
-	/*! trim xy1 data */
-	uint8_t dig_xy1;
-	/*! trim xy2 data */
-	int8_t dig_xy2;
-	/*! trim xyz1 data */
-	uint16_t dig_xyz1;
+    /*! trim x1 data */
+    int8_t dig_x1;
+    /*! trim y1 data */
+    int8_t dig_y1;
+    /*! trim x2 data */
+    int8_t dig_x2;
+    /*! trim y2 data */
+    int8_t dig_y2;
+    /*! trim z1 data */
+    uint16_t dig_z1;
+    /*! trim z2 data */
+    int16_t dig_z2;
+    /*! trim z3 data */
+    int16_t dig_z3;
+    /*! trim z4 data */
+    int16_t dig_z4;
+    /*! trim xy1 data */
+    uint8_t dig_xy1;
+    /*! trim xy2 data */
+    int8_t dig_xy2;
+    /*! trim xyz1 data */
+    uint16_t dig_xyz1;
 };
 
 /**
- * @brief bmm150 sensor settings
- */
+    @brief bmm150 sensor settings
+*/
 struct bmm150_settings {
-	/*! Control measurement of XYZ axes */
-	uint8_t xyz_axes_control;
-	/*! Power control bit value */
-	uint8_t pwr_cntrl_bit;
-	/*! Power control bit value */
-	uint8_t pwr_mode;
-	/*! Data rate value (ODR) */
-	uint8_t data_rate;
-	/*! XY Repetitions */
-	uint8_t xy_rep;
-	/*! Z Repetitions */
-	uint8_t z_rep;
-	/*! Preset mode of sensor */
-	uint8_t preset_mode;
-	/*! Interrupt configuration settings */
-	// struct bmm150_int_ctrl_settings int_settings;
+    /*! Control measurement of XYZ axes */
+    uint8_t xyz_axes_control;
+    /*! Power control bit value */
+    uint8_t pwr_cntrl_bit;
+    /*! Power control bit value */
+    uint8_t pwr_mode;
+    /*! Data rate value (ODR) */
+    uint8_t data_rate;
+    /*! XY Repetitions */
+    uint8_t xy_rep;
+    /*! Z Repetitions */
+    uint8_t z_rep;
+    /*! Preset mode of sensor */
+    uint8_t preset_mode;
+    /*! Interrupt configuration settings */
+    // struct bmm150_int_ctrl_settings int_settings;
 };
 
 #endif

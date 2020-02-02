@@ -3,43 +3,40 @@
 #include <Wire.h>
 
 
-BMM150::BMM150()
-{
+BMM150::BMM150() {
 }
 
-int8_t BMM150::initialize(void)
-{ 
-  Wire.begin();
+int8_t BMM150::initialize(void) {
+    Wire.begin();
 
-	/* Power up the sensor from suspend to sleep mode */
-  set_op_mode(BMM150_SLEEP_MODE);
-	delay(BMM150_START_UP_TIME);
+    /* Power up the sensor from suspend to sleep mode */
+    set_op_mode(BMM150_SLEEP_MODE);
+    delay(BMM150_START_UP_TIME);
 
-	/* Check chip ID */
-	uint8_t id = i2c_read(BMM150_CHIP_ID_ADDR);	
-	if(id != BMM150_CHIP_ID) {
-			return BMM150_E_ID_NOT_CONFORM;
-	}
+    /* Check chip ID */
+    uint8_t id = i2c_read(BMM150_CHIP_ID_ADDR);
+    if (id != BMM150_CHIP_ID) {
+        return BMM150_E_ID_NOT_CONFORM;
+    }
 
-	/* Function to update trim values */
-	read_trim_registers();
+    /* Function to update trim values */
+    read_trim_registers();
 
-  /* Setting the power mode as normal */
-  set_op_mode(BMM150_NORMAL_MODE);
+    /* Setting the power mode as normal */
+    set_op_mode(BMM150_NORMAL_MODE);
 
-	/* Setting the preset mode as Low power mode 
-	i.e. data rate = 10Hz XY-rep = 1 Z-rep = 2*/
-	set_presetmode(BMM150_PRESETMODE_LOWPOWER);
-	// set_presetmode(BMM150_HIGHACCURACY_REPZ);
-	
-  return BMM150_OK;
+    /*  Setting the preset mode as Low power mode
+        i.e. data rate = 10Hz XY-rep = 1 Z-rep = 2*/
+    set_presetmode(BMM150_PRESETMODE_LOWPOWER);
+    // set_presetmode(BMM150_HIGHACCURACY_REPZ);
+
+    return BMM150_OK;
 }
 
-void BMM150::read_mag_data()
-{
+void BMM150::read_mag_data() {
     int16_t msb_data;
     int8_t reg_data[BMM150_XYZR_DATA_LEN] = {0};
-    
+
     i2c_read(BMM150_DATA_X_LSB, reg_data, BMM150_XYZR_DATA_LEN);
 
     /* Mag X axis data */
@@ -76,200 +73,196 @@ void BMM150::read_mag_data()
 }
 
 /*
- * @brief This internal API is used to obtain the compensated
- * magnetometer X axis data(micro-tesla) in int16_t.
- */
-int16_t BMM150::compensate_x(int16_t mag_data_x, uint16_t data_rhall)
-{
-	int16_t retval;
-	uint16_t process_comp_x0 = 0;
-	int32_t process_comp_x1;
-	uint16_t process_comp_x2;
-	int32_t process_comp_x3;
-	int32_t process_comp_x4;
-	int32_t process_comp_x5;
-	int32_t process_comp_x6;
-	int32_t process_comp_x7;
-	int32_t process_comp_x8;
-	int32_t process_comp_x9;
-	int32_t process_comp_x10;
+    @brief This internal API is used to obtain the compensated
+    magnetometer X axis data(micro-tesla) in int16_t.
+*/
+int16_t BMM150::compensate_x(int16_t mag_data_x, uint16_t data_rhall) {
+    int16_t retval;
+    uint16_t process_comp_x0 = 0;
+    int32_t process_comp_x1;
+    uint16_t process_comp_x2;
+    int32_t process_comp_x3;
+    int32_t process_comp_x4;
+    int32_t process_comp_x5;
+    int32_t process_comp_x6;
+    int32_t process_comp_x7;
+    int32_t process_comp_x8;
+    int32_t process_comp_x9;
+    int32_t process_comp_x10;
 
-	/* Overflow condition check */
-	if (mag_data_x != BMM150_XYAXES_FLIP_OVERFLOW_ADCVAL) {
-		if (data_rhall != 0) {
-			/* Availability of valid data*/
-			process_comp_x0 = data_rhall;
-		} else if (trim_data.dig_xyz1 != 0) {
-			process_comp_x0 = trim_data.dig_xyz1;
-		} else {
-			process_comp_x0 = 0;
-		}
-		if (process_comp_x0 != 0) {
-			/* Processing compensation equations*/
-			process_comp_x1 = ((int32_t)trim_data.dig_xyz1) * 16384;
-			process_comp_x2 = ((uint16_t)(process_comp_x1 / process_comp_x0)) - ((uint16_t)0x4000);
-			retval = ((int16_t)process_comp_x2);
-			process_comp_x3 = (((int32_t)retval) * ((int32_t)retval));
-			process_comp_x4 = (((int32_t)trim_data.dig_xy2) * (process_comp_x3 / 128));
-			process_comp_x5 = (int32_t)(((int16_t)trim_data.dig_xy1) * 128);
-			process_comp_x6 = ((int32_t)retval) * process_comp_x5;
-			process_comp_x7 = (((process_comp_x4 + process_comp_x6) / 512) + ((int32_t)0x100000));
-			process_comp_x8 = ((int32_t)(((int16_t)trim_data.dig_x2) + ((int16_t)0xA0)));
-			process_comp_x9 = ((process_comp_x7 * process_comp_x8) / 4096);
-			process_comp_x10 = ((int32_t)mag_data_x) * process_comp_x9;
-			retval = ((int16_t)(process_comp_x10 / 8192));
-			retval = (retval + (((int16_t)trim_data.dig_x1) * 8)) / 16;
-		} else {
-			retval = BMM150_OVERFLOW_OUTPUT;
-		}
-	} else {
-		/* Overflow condition */
-		retval = BMM150_OVERFLOW_OUTPUT;
-	}
+    /* Overflow condition check */
+    if (mag_data_x != BMM150_XYAXES_FLIP_OVERFLOW_ADCVAL) {
+        if (data_rhall != 0) {
+            /* Availability of valid data*/
+            process_comp_x0 = data_rhall;
+        } else if (trim_data.dig_xyz1 != 0) {
+            process_comp_x0 = trim_data.dig_xyz1;
+        } else {
+            process_comp_x0 = 0;
+        }
+        if (process_comp_x0 != 0) {
+            /* Processing compensation equations*/
+            process_comp_x1 = ((int32_t)trim_data.dig_xyz1) * 16384;
+            process_comp_x2 = ((uint16_t)(process_comp_x1 / process_comp_x0)) - ((uint16_t)0x4000);
+            retval = ((int16_t)process_comp_x2);
+            process_comp_x3 = (((int32_t)retval) * ((int32_t)retval));
+            process_comp_x4 = (((int32_t)trim_data.dig_xy2) * (process_comp_x3 / 128));
+            process_comp_x5 = (int32_t)(((int16_t)trim_data.dig_xy1) * 128);
+            process_comp_x6 = ((int32_t)retval) * process_comp_x5;
+            process_comp_x7 = (((process_comp_x4 + process_comp_x6) / 512) + ((int32_t)0x100000));
+            process_comp_x8 = ((int32_t)(((int16_t)trim_data.dig_x2) + ((int16_t)0xA0)));
+            process_comp_x9 = ((process_comp_x7 * process_comp_x8) / 4096);
+            process_comp_x10 = ((int32_t)mag_data_x) * process_comp_x9;
+            retval = ((int16_t)(process_comp_x10 / 8192));
+            retval = (retval + (((int16_t)trim_data.dig_x1) * 8)) / 16;
+        } else {
+            retval = BMM150_OVERFLOW_OUTPUT;
+        }
+    } else {
+        /* Overflow condition */
+        retval = BMM150_OVERFLOW_OUTPUT;
+    }
 
-	return retval;
+    return retval;
 }
 
 /*
- * @brief This internal API is used to obtain the compensated
- * magnetometer Y axis data(micro-tesla) in int16_t.
- */
-int16_t BMM150::compensate_y(int16_t mag_data_y, uint16_t data_rhall)
-{
-	int16_t retval;
-	uint16_t process_comp_y0 = 0;
-	int32_t process_comp_y1;
-	uint16_t process_comp_y2;
-	int32_t process_comp_y3;
-	int32_t process_comp_y4;
-	int32_t process_comp_y5;
-	int32_t process_comp_y6;
-	int32_t process_comp_y7;
-	int32_t process_comp_y8;
-	int32_t process_comp_y9;
+    @brief This internal API is used to obtain the compensated
+    magnetometer Y axis data(micro-tesla) in int16_t.
+*/
+int16_t BMM150::compensate_y(int16_t mag_data_y, uint16_t data_rhall) {
+    int16_t retval;
+    uint16_t process_comp_y0 = 0;
+    int32_t process_comp_y1;
+    uint16_t process_comp_y2;
+    int32_t process_comp_y3;
+    int32_t process_comp_y4;
+    int32_t process_comp_y5;
+    int32_t process_comp_y6;
+    int32_t process_comp_y7;
+    int32_t process_comp_y8;
+    int32_t process_comp_y9;
 
-	/* Overflow condition check */
-	if (mag_data_y != BMM150_XYAXES_FLIP_OVERFLOW_ADCVAL) {
-		if (data_rhall != 0) {
-			/* Availability of valid data*/
-			process_comp_y0 = data_rhall;
-		} else if (trim_data.dig_xyz1 != 0) {
-			process_comp_y0 = trim_data.dig_xyz1;
-		} else {
-			process_comp_y0 = 0;
-		}
-		if (process_comp_y0 != 0) {
-			/*Processing compensation equations*/
-			process_comp_y1 = (((int32_t)trim_data.dig_xyz1) * 16384) / process_comp_y0;
-			process_comp_y2 = ((uint16_t)process_comp_y1) - ((uint16_t)0x4000);
-			retval = ((int16_t)process_comp_y2);
-			process_comp_y3 = ((int32_t) retval) * ((int32_t)retval);
-			process_comp_y4 = ((int32_t)trim_data.dig_xy2) * (process_comp_y3 / 128);
-			process_comp_y5 = ((int32_t)(((int16_t)trim_data.dig_xy1) * 128));
-			process_comp_y6 = ((process_comp_y4 + (((int32_t)retval) * process_comp_y5)) / 512);
-			process_comp_y7 = ((int32_t)(((int16_t)trim_data.dig_y2) + ((int16_t)0xA0)));
-			process_comp_y8 = (((process_comp_y6 + ((int32_t)0x100000)) * process_comp_y7) / 4096);
-			process_comp_y9 = (((int32_t)mag_data_y) * process_comp_y8);
-			retval = (int16_t)(process_comp_y9 / 8192);
-			retval = (retval + (((int16_t)trim_data.dig_y1) * 8)) / 16;
-		} else {
-			retval = BMM150_OVERFLOW_OUTPUT;
-		}
-	} else {
-		/* Overflow condition*/
-		retval = BMM150_OVERFLOW_OUTPUT;
-	}
+    /* Overflow condition check */
+    if (mag_data_y != BMM150_XYAXES_FLIP_OVERFLOW_ADCVAL) {
+        if (data_rhall != 0) {
+            /* Availability of valid data*/
+            process_comp_y0 = data_rhall;
+        } else if (trim_data.dig_xyz1 != 0) {
+            process_comp_y0 = trim_data.dig_xyz1;
+        } else {
+            process_comp_y0 = 0;
+        }
+        if (process_comp_y0 != 0) {
+            /*Processing compensation equations*/
+            process_comp_y1 = (((int32_t)trim_data.dig_xyz1) * 16384) / process_comp_y0;
+            process_comp_y2 = ((uint16_t)process_comp_y1) - ((uint16_t)0x4000);
+            retval = ((int16_t)process_comp_y2);
+            process_comp_y3 = ((int32_t) retval) * ((int32_t)retval);
+            process_comp_y4 = ((int32_t)trim_data.dig_xy2) * (process_comp_y3 / 128);
+            process_comp_y5 = ((int32_t)(((int16_t)trim_data.dig_xy1) * 128));
+            process_comp_y6 = ((process_comp_y4 + (((int32_t)retval) * process_comp_y5)) / 512);
+            process_comp_y7 = ((int32_t)(((int16_t)trim_data.dig_y2) + ((int16_t)0xA0)));
+            process_comp_y8 = (((process_comp_y6 + ((int32_t)0x100000)) * process_comp_y7) / 4096);
+            process_comp_y9 = (((int32_t)mag_data_y) * process_comp_y8);
+            retval = (int16_t)(process_comp_y9 / 8192);
+            retval = (retval + (((int16_t)trim_data.dig_y1) * 8)) / 16;
+        } else {
+            retval = BMM150_OVERFLOW_OUTPUT;
+        }
+    } else {
+        /* Overflow condition*/
+        retval = BMM150_OVERFLOW_OUTPUT;
+    }
 
-	return retval;
+    return retval;
 }
 
 /*
- * @brief This internal API is used to obtain the compensated
- * magnetometer Z axis data(micro-tesla) in int16_t.
- */
-int16_t BMM150::compensate_z(int16_t mag_data_z, uint16_t data_rhall)
-{
-	int32_t retval;
-	int16_t process_comp_z0;
-	int32_t process_comp_z1;
-	int32_t process_comp_z2;
-	int32_t process_comp_z3;
-	int16_t process_comp_z4;
+    @brief This internal API is used to obtain the compensated
+    magnetometer Z axis data(micro-tesla) in int16_t.
+*/
+int16_t BMM150::compensate_z(int16_t mag_data_z, uint16_t data_rhall) {
+    int32_t retval;
+    int16_t process_comp_z0;
+    int32_t process_comp_z1;
+    int32_t process_comp_z2;
+    int32_t process_comp_z3;
+    int16_t process_comp_z4;
 
-	if (mag_data_z != BMM150_ZAXIS_HALL_OVERFLOW_ADCVAL) {
-		if ((trim_data.dig_z2 != 0) && (trim_data.dig_z1 != 0)
-		&& (data_rhall != 0) && (trim_data.dig_xyz1 != 0)) {
-			/*Processing compensation equations*/
-			process_comp_z0 = ((int16_t)data_rhall) - ((int16_t) trim_data.dig_xyz1);
-			process_comp_z1 = (((int32_t)trim_data.dig_z3) * ((int32_t)(process_comp_z0))) / 4;
-			process_comp_z2 = (((int32_t)(mag_data_z - trim_data.dig_z4)) * 32768);
-			process_comp_z3 = ((int32_t)trim_data.dig_z1) * (((int16_t)data_rhall) * 2);
-			process_comp_z4 = (int16_t)((process_comp_z3 + (32768)) / 65536);
-			retval = ((process_comp_z2 - process_comp_z1) / (trim_data.dig_z2 + process_comp_z4));
+    if (mag_data_z != BMM150_ZAXIS_HALL_OVERFLOW_ADCVAL) {
+        if ((trim_data.dig_z2 != 0) && (trim_data.dig_z1 != 0)
+                && (data_rhall != 0) && (trim_data.dig_xyz1 != 0)) {
+            /*Processing compensation equations*/
+            process_comp_z0 = ((int16_t)data_rhall) - ((int16_t) trim_data.dig_xyz1);
+            process_comp_z1 = (((int32_t)trim_data.dig_z3) * ((int32_t)(process_comp_z0))) / 4;
+            process_comp_z2 = (((int32_t)(mag_data_z - trim_data.dig_z4)) * 32768);
+            process_comp_z3 = ((int32_t)trim_data.dig_z1) * (((int16_t)data_rhall) * 2);
+            process_comp_z4 = (int16_t)((process_comp_z3 + (32768)) / 65536);
+            retval = ((process_comp_z2 - process_comp_z1) / (trim_data.dig_z2 + process_comp_z4));
 
-			/* saturate result to +/- 2 micro-tesla */
-			if (retval > BMM150_POSITIVE_SATURATION_Z) {
-				retval =  BMM150_POSITIVE_SATURATION_Z;
-			} else {
-				if (retval < BMM150_NEGATIVE_SATURATION_Z)
-					retval = BMM150_NEGATIVE_SATURATION_Z;
-			}
-			/* Conversion of LSB to micro-tesla*/
-			retval = retval / 16;
-		} else {
-			retval = BMM150_OVERFLOW_OUTPUT;
+            /* saturate result to +/- 2 micro-tesla */
+            if (retval > BMM150_POSITIVE_SATURATION_Z) {
+                retval =  BMM150_POSITIVE_SATURATION_Z;
+            } else {
+                if (retval < BMM150_NEGATIVE_SATURATION_Z) {
+                    retval = BMM150_NEGATIVE_SATURATION_Z;
+                }
+            }
+            /* Conversion of LSB to micro-tesla*/
+            retval = retval / 16;
+        } else {
+            retval = BMM150_OVERFLOW_OUTPUT;
 
-		}
-	} else {
-		/* Overflow condition*/
-		retval = BMM150_OVERFLOW_OUTPUT;
-	}
+        }
+    } else {
+        /* Overflow condition*/
+        retval = BMM150_OVERFLOW_OUTPUT;
+    }
 
-	return (int16_t)retval;
+    return (int16_t)retval;
 }
 
-void BMM150::set_presetmode(uint8_t preset_mode)
-{
+void BMM150::set_presetmode(uint8_t preset_mode) {
     switch (preset_mode) {
-		case BMM150_PRESETMODE_LOWPOWER:
-			/* Set the data rate x,y,z repetition
-			for Low Power mode */
-			settings.data_rate = BMM150_DATA_RATE_10HZ;
-			settings.xy_rep = BMM150_LOWPOWER_REPXY;
-			settings.z_rep = BMM150_LOWPOWER_REPZ;
-			set_odr_xyz_rep(settings);
-			break;
-		case BMM150_PRESETMODE_REGULAR:
-			/* Set the data rate x,y,z repetition
-			for Regular mode */
-			settings.data_rate = BMM150_DATA_RATE_10HZ;
-			settings.xy_rep = BMM150_REGULAR_REPXY;
-			settings.z_rep = BMM150_REGULAR_REPZ;
-			set_odr_xyz_rep(settings);
-			break;
-		case BMM150_PRESETMODE_HIGHACCURACY:
-			/* Set the data rate x,y,z repetition
-			for High Accuracy mode */
-			settings.data_rate = BMM150_DATA_RATE_20HZ;
-			settings.xy_rep = BMM150_HIGHACCURACY_REPXY;
-			settings.z_rep = BMM150_HIGHACCURACY_REPZ;
-			set_odr_xyz_rep(settings);
-			break;
-		case BMM150_PRESETMODE_ENHANCED:
-			/* Set the data rate x,y,z repetition
-			for Enhanced Accuracy mode */
-			settings.data_rate = BMM150_DATA_RATE_10HZ;
-			settings.xy_rep = BMM150_ENHANCED_REPXY;
-			settings.z_rep = BMM150_ENHANCED_REPZ;
-			set_odr_xyz_rep(settings);
-			break;
-		default:
-			break;
-		}
+        case BMM150_PRESETMODE_LOWPOWER:
+            /*  Set the data rate x,y,z repetition
+                for Low Power mode */
+            settings.data_rate = BMM150_DATA_RATE_10HZ;
+            settings.xy_rep = BMM150_LOWPOWER_REPXY;
+            settings.z_rep = BMM150_LOWPOWER_REPZ;
+            set_odr_xyz_rep(settings);
+            break;
+        case BMM150_PRESETMODE_REGULAR:
+            /*  Set the data rate x,y,z repetition
+                for Regular mode */
+            settings.data_rate = BMM150_DATA_RATE_10HZ;
+            settings.xy_rep = BMM150_REGULAR_REPXY;
+            settings.z_rep = BMM150_REGULAR_REPZ;
+            set_odr_xyz_rep(settings);
+            break;
+        case BMM150_PRESETMODE_HIGHACCURACY:
+            /*  Set the data rate x,y,z repetition
+                for High Accuracy mode */
+            settings.data_rate = BMM150_DATA_RATE_20HZ;
+            settings.xy_rep = BMM150_HIGHACCURACY_REPXY;
+            settings.z_rep = BMM150_HIGHACCURACY_REPZ;
+            set_odr_xyz_rep(settings);
+            break;
+        case BMM150_PRESETMODE_ENHANCED:
+            /*  Set the data rate x,y,z repetition
+                for Enhanced Accuracy mode */
+            settings.data_rate = BMM150_DATA_RATE_10HZ;
+            settings.xy_rep = BMM150_ENHANCED_REPXY;
+            settings.z_rep = BMM150_ENHANCED_REPZ;
+            set_odr_xyz_rep(settings);
+            break;
+        default:
+            break;
+    }
 }
 
-void BMM150::set_odr_xyz_rep(struct bmm150_settings settings)
-{
+void BMM150::set_odr_xyz_rep(struct bmm150_settings settings) {
     /* Set the ODR */
     set_odr(settings);
     /* Set the XY-repetitions number */
@@ -278,86 +271,74 @@ void BMM150::set_odr_xyz_rep(struct bmm150_settings settings)
     set_z_rep(settings);
 }
 
-void BMM150::set_xy_rep(struct bmm150_settings settings)
-{   
+void BMM150::set_xy_rep(struct bmm150_settings settings) {
     uint8_t rep_xy;
     rep_xy = settings.xy_rep;
     i2c_write(BMM150_REP_XY_ADDR, rep_xy);
 
 }
 
-void BMM150::set_z_rep(struct bmm150_settings settings)
-{
+void BMM150::set_z_rep(struct bmm150_settings settings) {
     uint8_t rep_z;
     rep_z = settings.z_rep;
     i2c_write(BMM150_REP_Z_ADDR, rep_z);
 }
 
 
-void BMM150::soft_reset()
-{
-	uint8_t reg_data;
+void BMM150::soft_reset() {
+    uint8_t reg_data;
 
-	reg_data = i2c_read(BMM150_POWER_CONTROL_ADDR);
-	reg_data = reg_data | BMM150_SET_SOFT_RESET;
-	i2c_write(BMM150_POWER_CONTROL_ADDR, reg_data);
-	delay(BMM150_SOFT_RESET_DELAY);
+    reg_data = i2c_read(BMM150_POWER_CONTROL_ADDR);
+    reg_data = reg_data | BMM150_SET_SOFT_RESET;
+    i2c_write(BMM150_POWER_CONTROL_ADDR, reg_data);
+    delay(BMM150_SOFT_RESET_DELAY);
 }
 
 
-void BMM150::set_odr(struct bmm150_settings settings)
-{
+void BMM150::set_odr(struct bmm150_settings settings) {
     uint8_t reg_data;
 
     reg_data = i2c_read(BMM150_OP_MODE_ADDR);
     /*Set the ODR value */
-		reg_data = BMM150_SET_BITS(reg_data, BMM150_ODR, settings.data_rate);
+    reg_data = BMM150_SET_BITS(reg_data, BMM150_ODR, settings.data_rate);
     i2c_write(BMM150_OP_MODE_ADDR, reg_data);
 }
 
-void BMM150::i2c_write(short address, short data)
-{
+void BMM150::i2c_write(short address, short data) {
     Wire.beginTransmission(BMM150_I2C_Address);
     Wire.write(address);
     Wire.write(data);
     Wire.endTransmission();
 }
 
-void BMM150::i2c_read(short address, uint8_t *buffer, short length)
-{
+void BMM150::i2c_read(short address, uint8_t* buffer, short length) {
     Wire.beginTransmission(BMM150_I2C_Address);
     Wire.write(address);
     Wire.endTransmission();
     Wire.requestFrom(BMM150_I2C_Address, length);
-    
-    if(Wire.available() == length)
-    {
-        for(uint8_t i = 0; i < length; i++)
-        {
+
+    if (Wire.available() == length) {
+        for (uint8_t i = 0; i < length; i++) {
             buffer[i] = Wire.read();
         }
     }
 }
 
 
-void BMM150::i2c_read(short address, int8_t *buffer, short length)
-{
+void BMM150::i2c_read(short address, int8_t* buffer, short length) {
     Wire.beginTransmission(BMM150_I2C_Address);
     Wire.write(address);
     Wire.endTransmission();
     Wire.requestFrom(BMM150_I2C_Address, length);
-    
-    if(Wire.available() == length)
-    {
-        for(uint8_t i = 0; i < length; i++)
-        {
+
+    if (Wire.available() == length) {
+        for (uint8_t i = 0; i < length; i++) {
             buffer[i] = Wire.read();
         }
     }
 }
 
-uint8_t BMM150::i2c_read(short address)
-{
+uint8_t BMM150::i2c_read(short address) {
     uint8_t byte;
 
     Wire.beginTransmission(BMM150_I2C_Address);
@@ -377,27 +358,26 @@ uint8_t BMM150::i2c_read(short address)
 //     return "Error not defined.";
 // }
 
-void BMM150::set_op_mode(uint8_t pwr_mode)
-{	
+void BMM150::set_op_mode(uint8_t pwr_mode) {
     /* Select the power mode to set */
     switch (pwr_mode) {
         case BMM150_NORMAL_MODE:
-            /* If the sensor is in suspend mode
-            put the device to sleep mode */
+            /*  If the sensor is in suspend mode
+                put the device to sleep mode */
             suspend_to_sleep_mode();
             /* write the op mode */
             write_op_mode(pwr_mode);
             break;
         case BMM150_FORCED_MODE:
-            /* If the sensor is in suspend mode
-            put the device to sleep mode */
+            /*  If the sensor is in suspend mode
+                put the device to sleep mode */
             suspend_to_sleep_mode();
             /* write the op mode */
             write_op_mode(pwr_mode);
             break;
         case BMM150_SLEEP_MODE:
-            /* If the sensor is in suspend mode
-            put the device to sleep mode */
+            /*  If the sensor is in suspend mode
+                put the device to sleep mode */
             suspend_to_sleep_mode();
             /* write the op mode */
             write_op_mode(pwr_mode);
@@ -411,58 +391,54 @@ void BMM150::set_op_mode(uint8_t pwr_mode)
     }
 }
 
-void BMM150::suspend_to_sleep_mode(void)
-{
+void BMM150::suspend_to_sleep_mode(void) {
     set_power_control_bit(BMM150_POWER_CNTRL_ENABLE);
     /* Start-up time delay of 3ms*/
     delay(3);
 }
 
 
-void BMM150::read_trim_registers()
-{
-	uint8_t trim_x1y1[2] = {0};
-	uint8_t trim_xyz_data[4] = {0};
-	uint8_t trim_xy1xy2[10] = {0};
-	uint16_t temp_msb = 0;
+void BMM150::read_trim_registers() {
+    uint8_t trim_x1y1[2] = {0};
+    uint8_t trim_xyz_data[4] = {0};
+    uint8_t trim_xy1xy2[10] = {0};
+    uint16_t temp_msb = 0;
 
-	/* Trim register value is read */
-	i2c_read(BMM150_DIG_X1, trim_x1y1, 2);
-	i2c_read(BMM150_DIG_Z4_LSB, trim_xyz_data, 4);
-	i2c_read(BMM150_DIG_Z2_LSB, trim_xy1xy2, 10);
-	/* Trim data which is read is updated
-	in the device structure */
-	trim_data.dig_x1 = (int8_t)trim_x1y1[0];
-	trim_data.dig_y1 = (int8_t)trim_x1y1[1];
-	trim_data.dig_x2 = (int8_t)trim_xyz_data[2];
-	trim_data.dig_y2 = (int8_t)trim_xyz_data[3];
-	temp_msb = ((uint16_t)trim_xy1xy2[3]) << 8;
-	trim_data.dig_z1 = (uint16_t)(temp_msb | trim_xy1xy2[2]);
-	temp_msb = ((uint16_t)trim_xy1xy2[1]) << 8;
-	trim_data.dig_z2 = (int16_t)(temp_msb | trim_xy1xy2[0]);
-	temp_msb = ((uint16_t)trim_xy1xy2[7]) << 8;
-	trim_data.dig_z3 = (int16_t)(temp_msb | trim_xy1xy2[6]);
-	temp_msb = ((uint16_t)trim_xyz_data[1]) << 8;
-	trim_data.dig_z4 = (int16_t)(temp_msb | trim_xyz_data[0]);
-	trim_data.dig_xy1 = trim_xy1xy2[9];
-	trim_data.dig_xy2 = (int8_t)trim_xy1xy2[8];
-	temp_msb = ((uint16_t)(trim_xy1xy2[5] & 0x7F)) << 8;
-	trim_data.dig_xyz1 = (uint16_t)(temp_msb | trim_xy1xy2[4]);
+    /* Trim register value is read */
+    i2c_read(BMM150_DIG_X1, trim_x1y1, 2);
+    i2c_read(BMM150_DIG_Z4_LSB, trim_xyz_data, 4);
+    i2c_read(BMM150_DIG_Z2_LSB, trim_xy1xy2, 10);
+    /*  Trim data which is read is updated
+        in the device structure */
+    trim_data.dig_x1 = (int8_t)trim_x1y1[0];
+    trim_data.dig_y1 = (int8_t)trim_x1y1[1];
+    trim_data.dig_x2 = (int8_t)trim_xyz_data[2];
+    trim_data.dig_y2 = (int8_t)trim_xyz_data[3];
+    temp_msb = ((uint16_t)trim_xy1xy2[3]) << 8;
+    trim_data.dig_z1 = (uint16_t)(temp_msb | trim_xy1xy2[2]);
+    temp_msb = ((uint16_t)trim_xy1xy2[1]) << 8;
+    trim_data.dig_z2 = (int16_t)(temp_msb | trim_xy1xy2[0]);
+    temp_msb = ((uint16_t)trim_xy1xy2[7]) << 8;
+    trim_data.dig_z3 = (int16_t)(temp_msb | trim_xy1xy2[6]);
+    temp_msb = ((uint16_t)trim_xyz_data[1]) << 8;
+    trim_data.dig_z4 = (int16_t)(temp_msb | trim_xyz_data[0]);
+    trim_data.dig_xy1 = trim_xy1xy2[9];
+    trim_data.dig_xy2 = (int8_t)trim_xy1xy2[8];
+    temp_msb = ((uint16_t)(trim_xy1xy2[5] & 0x7F)) << 8;
+    trim_data.dig_xyz1 = (uint16_t)(temp_msb | trim_xy1xy2[4]);
 
 }
 
-void BMM150::write_op_mode(uint8_t op_mode)
-{
+void BMM150::write_op_mode(uint8_t op_mode) {
     uint8_t reg_data = 0;
     reg_data = i2c_read(BMM150_OP_MODE_ADDR);
     /* Set the op_mode value in Opmode bits of 0x4C */
-	  reg_data = BMM150_SET_BITS(reg_data, BMM150_OP_MODE, op_mode);
+    reg_data = BMM150_SET_BITS(reg_data, BMM150_OP_MODE, op_mode);
     i2c_write(BMM150_OP_MODE_ADDR, reg_data);
 }
 
-void BMM150::set_power_control_bit(uint8_t pwrcntrl_bit)
-{
-	uint8_t reg_data = 0;
+void BMM150::set_power_control_bit(uint8_t pwrcntrl_bit) {
+    uint8_t reg_data = 0;
     /* Power control register 0x4B is read */
     reg_data = i2c_read(BMM150_POWER_CONTROL_ADDR);
     /* Sets the value of power control bit */
@@ -707,7 +683,7 @@ void BMM150::set_power_control_bit(uint8_t pwrcntrl_bit)
 //  * measurement of x,y,z axes based on the value of xyz_axes_control.
 //  */
 // void BMM150::set_control_measurement_xyz(struct bmm150_settings settings)
-// {	
+// {
 // 	uint8_t reg_data;
 
 // 	reg_data = i2c_read(BMM150_AXES_ENABLE_ADDR);
