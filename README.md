@@ -1,4 +1,4 @@
-# Grove_3_Axis_Compass_V2.0(BMM150)
+# Grove_3_Axis_Compass_V2.0(BMM150)  [![Build Status](https://travis-ci.com/Seeed-Studio/Grove_3_Axis_Compass_V2.0_BMM150.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Grove_3_Axis_Compass_V2.0_BMM150)
 This is Arduino library for **Bosch BMM150** a Geomagnetic Sensor IC.
 
 <img src=https://github.com/SeeedDocument/Bazaar_doc/raw/master/101020492/main_page.jpg width=400>
