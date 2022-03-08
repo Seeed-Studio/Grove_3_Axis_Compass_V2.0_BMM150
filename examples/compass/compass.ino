@@ -46,6 +46,10 @@ void loop() {
 
     Serial.print("Heading: ");
     Serial.println(headingDegrees);
+    Serial.print("xyHeading: ");
+    Serial.println(xyHeadingDegrees);
+    Serial.print("zxHeading: ");
+    Serial.println(zxHeadingDegrees);
 
     delay(100);
 }
